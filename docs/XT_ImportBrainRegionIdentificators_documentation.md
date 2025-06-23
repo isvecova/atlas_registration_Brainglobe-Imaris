@@ -12,8 +12,8 @@ The XTension bridges the gap between BrainGlobe atlas registration and Imaris vi
 ## Installation
 
 ### Prerequisites
-- **Imaris Version**: 9.x or later with XTension support
-- **MATLAB Integration**: Imaris MATLAB interface enabled
+- **Imaris Version**: 10.x or later with XTension support (compatibility with earlier versions not verified)
+- **MATLAB Integration**: Imaris MATLAB interface enabled, Matlab Runtime installed
 
 ### Installation Steps
 

@@ -1,8 +1,9 @@
-# ImageJ Rescale Macro Documentation (`00a_rescaleMacro.ijm`)
+# ImageJ Rescale Macro Documentation (`00a_rescaleMacroBatch.ijm`/`00b_rescaleMacro.ijm`)
 
 ## Overview
 
-This ImageJ macro script automatically processes multiple `.ims` files in a folder by rescaling them to match the voxel size of a target atlas (specifically set for the Perens LSFM mouse atlas at 20 μm/pixel resolution).
+The `00a_rescaleMacroBatch.ijm` ImageJ macro script automatically processes all `.ims` files in a folder by rescaling them to match the voxel size of a target atlas (by default set for the Perens LSFM mouse atlas at 20 μm/pixel resolution). 
+The `00b_rescaleMacro.ijm` script does the same thing, except for processing individual `.ims` file rather than entire folder.
 
 ## Purpose
 
@@ -87,7 +88,7 @@ resolutionLevel = 3;
 2. **Launch and Run**:
     - Open ImageJ/Fiji
     - Go to `Plugins → Macros → Run...` 
-    - Select the `00a_rescaleMacro.ijm` file
+    - Select the `00a_rescaleMacroBatch.ijm` file
     - Follow the folder selection prompt
 
 ### Before Running

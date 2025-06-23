@@ -1,3 +1,5 @@
+// Batch version - this script will process all .ims files in a user-selected folder
+
 // ============== PARAMETERS TO SPECIFY BEFORE RUNNING THE SCRIPT: ==============
 
 // Specify the channel that contains autofluorescence information: 
@@ -38,12 +40,13 @@ for (i = 0; i < list.length; i++) {
         close(longImageName);
         selectImage("processed");
         
-        // Get pixel size
+        // Calculate rescaling factors based on current and end pixel size
         getPixelSize(unit, pixelWidth, pixelHeight, voxelDepth);
         rescaleXY = pixelWidth / endPixelSize;
         rescaleZ = voxelDepth / endPixelSize;
         
-        // Rescale
+        // Rescale - change the number of pixels and their size
+        // NOTE: Total size of the image in um is preserved
         run("Scale...", "x=" + rescaleXY + " y=" + rescaleXY + " z=" + rescaleZ + 
             " interpolation=Bilinear average process create title=rescaled");
         close("processed");

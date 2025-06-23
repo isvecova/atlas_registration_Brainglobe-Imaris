@@ -1,3 +1,5 @@
+// Single file version - this script will process a single user-selected file at the time
+
 // ============== PARAMETERS TO SPECIFY BEFORE RUNNING THE SCRIPT: ==============
 
 // Specify the channel that contains autofluorescence information: 
@@ -25,15 +27,8 @@ if (endsWith(filePath, ".ims")) {
     showMessage("Invalid file type or no file selected.");
 }
 
-// Store the original name (contains the resolution level info) for later
-originalImageName = getTitle();
-print(originalImageName);
-
-lastSeparator = lastIndexOf(filePath, File.separator);
-name = substring(filePath, lastSeparator + 1);
-print(name);
-
 // Duplicate the selected channel and close the original one
+originalImageName = getTitle();     // Gets the long name of the opened image - contains also info about resolution level, ...
 run("Duplicate...", "title=processed duplicate channels=" + channel);
 close(originalImageName);
 selectImage("processed");
@@ -49,12 +44,11 @@ run("Scale...", "x=" + rescaleXY + " y=" + rescaleXY + " z=" + rescaleZ + "inter
 close("processed");
 
 // Extract folder from file path and filename
-imsIndex = indexOf(originalImageName, ".ims");
-baseName = substring(originalImageName, 0, imsIndex);
-print(baseName);
 lastSeparator = lastIndexOf(filePath, File.separator);
 folder = substring(filePath, 0, lastSeparator + 1);
+originalName = substring(filePath, lastSeparator + 1);
+originalName = substring(originalName, 0, lengthOf(originalName) - 4);  // Remove ".ims"
 
 // Construct save path and save
-savePath = folder + "processed_" + baseName + ".tif";
+savePath = folder + "processed_" + originalName + ".tif";
 saveAs("Tiff", savePath);
