@@ -12,7 +12,7 @@ This repository contains a pipeline for registering Imaris .ims brain images to 
 
 - [ImageJ / Fiji](https://fiji.sc/) ([Schindelin et al., 2012](https://doi.org/10.1038/nmeth.2019)) - part 1
 - [Miniconda](https://docs.conda.io/en/latest/miniconda.html) - part 1 and 2
-- [Python 3.10+](https://www.python.org/) - part 1 and 2
+- [Python 3.12](https://www.python.org/) - part 1 and 2
 - [BrainGlobe](https://brainglobe.info/) ([Claudi et al., 2021](https://joss.theoj.org/papers/10.21105/joss.02668); [Tyson et al., 2022](https://doi.org/10.1038/s41598-021-04676-9)) - part 1 and 2
 - [Imaris](https://imaris.oxinst.com/) (with XTension support) - part 3
 
@@ -102,7 +102,7 @@ python mask_processing_pipeline.py
 
 6. The script will output the processed mask (adjusted\_mask.tiff) in the same folder.
 
-## 3. Import brain regions to Imaris (Custom Imaris XTension)
+## 3. Brain region import to Imaris (Custom Imaris XTension)
 
 **[Detailed Documentation](docs/XT_ImportBrainRegionIdentificators_documentation.md)**
 
