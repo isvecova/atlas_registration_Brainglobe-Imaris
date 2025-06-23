@@ -76,6 +76,20 @@ resolutionLevel = 3;
 
 ## Usage Guidelines
 
+### How to Run the Macro
+
+1. **Prerequisites**:
+    - Install [ImageJ](https://imagej.nih.gov/ij/download.html) or [Fiji](https://fiji.sc/) (recommended)
+    - Ensure Bio-Formats plugin is installed and working
+      - Fiji: Bio-Formats comes pre-installed
+      - ImageJ: Install Bio-Formats from [here](https://www.openmicroscopy.org/bio-formats/)
+
+2. **Launch and Run**:
+    - Open ImageJ/Fiji
+    - Go to `Plugins → Macros → Run...` 
+    - Select the `00a_rescaleMacro.ijm` file
+    - Follow the folder selection prompt
+
 ### Before Running
 1. **Verify channel assignment**: Check which channel contains autofluorescence
 2. **Confirm atlas specifications**: Ensure `endPixelSize` matches your target atlas
@@ -110,6 +124,52 @@ resolutionLevel = 3;
 5. **Interpolation artifacts**
    - **Cause**: Extreme scaling ratios
    - **Solution**: Choose appropriate resolution level, consider different interpolation methods
+
+## Manual Process Alternative
+
+If you need to rescale images manually instead of using the automated macro, follow these steps:
+
+### Manual Rescaling in ImageJ/Fiji
+
+1. **Open the .ims file**:
+    - Go to `File → Import → Bio-Formats`
+    - Navigate to your `.ims` file
+    - In the Bio-Formats Import Options dialog, select the appropriate series/resolution level
+    - Click OK to open the image
+
+2. **Extract the autofluorescence channel**:
+    - Go to `Image → Duplicate...`
+    - In the dialog box, check "Duplicate channels" and specify the autofluorescence channel (typically 2)
+    - Click "OK" to create a new image with only the selected channel
+    - Close the original multi-channel image if not needed
+
+3. **Check current voxel size**:
+    - Go to `Image → Properties`
+    - Note the current pixel width, height, and voxel depth
+    - Record the unit of measurement (usually μm)
+
+4. **Calculate scaling factors**:
+    - Divide current pixel width by target pixel size (e.g., 2.5 μm ÷ 20 μm = 0.125)
+    - Divide current voxel depth by target pixel size (e.g., 3 μm ÷ 20 μm = 0.15)
+    - These are your X/Y and Z scaling factors respectively
+
+5. **Perform the rescaling**:
+    - Go to `Image → Scale...`
+    - Enter your calculated X, Y scaling factor in respective fields
+    - Enter your calculated Z scaling factor
+    - Select "Bilinear interpolation"
+    - Check "Create new window" and "Scale all slices"
+    - Click "OK"
+
+6. **Verify new dimensions**:
+    - Go to `Image → Properties`
+    - Confirm all dimensions (X, Y, Z) are now at or very close to your target pixel size
+    - Adjust if needed
+
+7. **Save the processed image**:
+    - Go to `File → Save As → Tiff`
+    - Name it with "processed_" prefix followed by original name
+    - Save in the same folder as the original for consistency
 
 
 ## Integration with Pipeline

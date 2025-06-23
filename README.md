@@ -1,16 +1,12 @@
 # Brain registration and atlas processing using BrainGlobe and Imaris
 
-This repository contains a## 3. Mask Processing (Python script)
+This repository contains a pipeline for registering Imaris .ims brain images to a BrainGlobe atlas using ImageJ, Napari, BrainGlobe tools, and Imaris. You can use the full pipeline or just selected components - for example, to process a region mask and import it into Imaris with anatomical region names and IDs
 
-1. Open `01_mask_processing_pipeline.py`
-2. If needed, adjust parameters, such as the list of regions to flatten.
-3. Run the script.
-
-📖 **[Detailed Documentation](docs/01_mask_processing_pipeline_documentation.md)** | **[Function Reference](docs/mask_processing_functions_documentation.md)**
+**[Detailed Documentation](docs/01_mask_processing_pipeline_documentation.md)** | **[Function Reference](docs/mask_processing_functions_documentation.md)**
 
 You can run the script from the Anaconda Prompt as follows:ne for registering Imaris `.ims` brain images to a BrainGlobe atlas using ImageJ, Napari, BrainGlobe tools, and Imaris. You can use the full pipeline or just selected components, for example, to process a region mask and import it into Imaris with anatomical region names and IDs.
 
-## 📚 Documentation
+## Documentation
 
 Detailed documentation for all scripts and components is available in the [`docs/`](docs/) directory:
 
@@ -74,7 +70,7 @@ Restart Imaris.
 2. In the macro, adjust parameters if needed.
 3. Run the macro.
 
-📖 **[Detailed Documentation](docs/00a_rescaleMacro_documentation.md)** | **[Batch Version](docs/00b_rescaleMacroBatch_documentation.md)**
+**[Detailed Documentation](docs/00a_rescaleMacro_documentation.md)** | **[Batch Version](docs/00b_rescaleMacroBatch_documentation.md)**
 
 What the macro does:
 
@@ -138,7 +134,7 @@ python mask_processing_pipeline.py
 
 ## 4. Import and Label in Imaris
 
-📖 **[Detailed Documentation](docs/XT_ImportBrainRegionIdentificators_documentation.md)**
+**[Detailed Documentation](docs/XT_ImportBrainRegionIdentificators_documentation.md)**
 
 1. Open original `.ims` file
 2. Go to:
