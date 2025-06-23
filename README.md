@@ -2,26 +2,25 @@
 
 This repository contains a pipeline for registering Imaris .ims brain images to a BrainGlobe atlas, processing the resulting masks and uploading them to Imaris as surfaces. The pipeline is divided into 3 main parts, that can be used separately:
 
-1. Raw .ims data downscaling (ImageJ macro), followed by brain atlas registration in BrainGlobe (not automated).
-2. Processing of the brain region mask (Python script) - adjusting the level of details, discarding small disconnected components and converting the mask from 32-bit to 16-bit image. 
-3. Importing the mask to Imaris (built-in Imaris function) followed by importing corresponding brain region and IDs (custom Imaris XTension).
+1. Raw .ims data downscaling (ImageJ macro: `00a_rescaleMacroBatch.ijm`/`00b_rescaleMacro.ijm`), followed by brain atlas registration in BrainGlobe (not automated)
+2. Processing of the brain region mask (Python script: `01_mask_processing_pipeline.py`) - adjusting the level of details, discarding small disconnected components and converting the mask from 32-bit to 16-bit image. 
+3. Importing the mask to Imaris (built-in Imaris function) followed by importing corresponding brain region and IDs (custom Imaris XTension: `XT_ImportBrainRegionIdentificators.m`).
 
 ---
 
 ## &#x20;Requirements
 
-- [ImageJ / Fiji](https://fiji.sc/) ([Schindelin et al., 2012](https://doi.org/10.1038/nmeth.2019))
-- [Miniconda](https://docs.conda.io/en/latest/miniconda.html)
-- [Python 3.10+](https://www.python.org/)
-- [Napari](https://napari.org/) (napari contributors (2019). napari: a multi-dimensional image viewer for python. [doi:10.5281/zenodo.3555620](https://zenodo.org/record/3555620))
-- [BrainGlobe](https://brainglobe.info/) ([Claudi et al., 2021](https://joss.theoj.org/papers/10.21105/joss.02668); [Tyson et al., 2022](https://doi.org/10.1038/s41598-021-04676-9))
-- [Imaris](https://imaris.oxinst.com/) (with XTension support)
+- [ImageJ / Fiji](https://fiji.sc/) ([Schindelin et al., 2012](https://doi.org/10.1038/nmeth.2019)) - part 1
+- [Miniconda](https://docs.conda.io/en/latest/miniconda.html) - part 1 and 2
+- [Python 3.10+](https://www.python.org/) - part 1 and 2
+- [BrainGlobe](https://brainglobe.info/) ([Claudi et al., 2021](https://joss.theoj.org/papers/10.21105/joss.02668); [Tyson et al., 2022](https://doi.org/10.1038/s41598-021-04676-9)) - part 1 and 2
+- [Imaris](https://imaris.oxinst.com/) (with XTension support) - part 3
 
 ---
 
 ## Installation
 
-### 1. Set up the Python environment (required for registration and subsequent mask processing)
+### 1. Set up the Python BrainGlobe environment (required for registration and subsequent mask processing)
 
 ```bash
 conda create -n brainglobe_env python=3.12
@@ -43,24 +42,16 @@ C:\Users\<YourUsername>\Documents\Imaris\XTensions
 
 Restart Imaris.
 
-## Workflow Overview
-
-1. **Rescale** image to isotropic resolution and voxel size of the atlas using ImageJ, **Register** the image to an atlas using Napari + BrainGlobe
-2. **Process the mask** with Python script
-3. **Import labels and corresponding names and ids** in Imaris
-
 ---
 
 ## 1. Rescaling and registration
 ### Rescaling (ImageJ / Fiji) 
 
+**[Detailed Documentation](docs/00_rescaleMacro_documentation.md)**
+
 1. Open the macro script (`00a_rescaleMacro.ijm`) in Fiji. Alternatively, if you want to process more files at once, open the batch script option (`00b_rescaleMacroBatch.ijm`)
 2. In the macro, adjust parameters if needed.
 3. Run the macro.
-
-**[Detailed Documentation](docs/00_rescaleMacro_documentation.md)**
-
----
 
 ### Registration (manually in Napari + BrainGlobe)
 
@@ -77,8 +68,6 @@ Restart Imaris.
    - Keep other settings default unless optimizing
 5. Click **Run**
 6. If registration misaligned, try changing *Smoothing sigma* to `0`, and optimize other parameters
-
----
 
 ## 2. Mask Processing (Python script)
 
@@ -113,8 +102,6 @@ python mask_processing_pipeline.py
 
 6. The script will output the processed mask (adjusted\_mask.tiff) in the same folder.
 
----
-
 ## 3. Import and Label in Imaris
 
 **[Detailed Documentation](docs/XT_ImportBrainRegionIdentificators_documentation.md)**
@@ -136,8 +123,7 @@ python mask_processing_pipeline.py
 5. Wait for label import to finish (may take a few minutes)
 
 
-
-## Alternative import to Imaris
+### Alternative import to Imaris
 
 In case of big datasets, the import of identifiers can get stuck. In that case, you can use a workaround. Instead of opening the original `.ims` file, you can use the downsampled `.tiff` file directly:
 

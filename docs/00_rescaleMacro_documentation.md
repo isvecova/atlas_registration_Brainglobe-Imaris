@@ -31,15 +31,10 @@ resolutionLevel = 3;
 1. **`channel`** (integer)
    - **Purpose**: Selects which channel contains the autofluorescence signal needed for registration
    - **Default**: `2`
-   - **Considerations**: 
-     - Channel 1 is typically the signal of interest (e.g., fluorescent labels)
-     - Channel 2 is often autofluorescence, which provides anatomical contrast
-     - Verify your channel configuration before running
 
 2. **`endPixelSize`** (float, μm)
-   - **Purpose**: Target voxel size to match the atlas resolution
+   - **Purpose**: Target voxel size to match the atlas resolution and make the image size manageable by BrainGlobe
    - **Default**: `20` (for Perens LSFM mouse atlas)
-   - **Important**: Must match your target atlas specifications
    - **Other common values**:
      - Allen Mouse Brain Atlas: 10 μm, 25 μm, or 50 μm
      - Custom atlases: Check atlas documentation
@@ -63,12 +58,11 @@ resolutionLevel = 3;
 ### Image Properties
 - **Dimensions**: 3D (X, Y, Z) stacks
 - **Metadata**: Must contain voxel size information
-- **Resolution**: Should have multiple pyramid levels for optimal performance
-
+- **Resolution**: Should have multiple pyramid levels, has to contain the resolution level indicated by `resolutionLevel` parameter
 ## Output
 
 ### Generated Files
-- **Format**: `.tif` (TIFF)
+- **Format**: `.tif`
 - **Naming**: `processed_[original_name].tif`
 - **Location**: Same folder as input files
 - **Properties**:
@@ -94,7 +88,7 @@ resolutionLevel = 3;
 ### Before Running
 1. **Verify channel assignment**: Check which channel contains autofluorescence
 2. **Confirm atlas specifications**: Ensure `endPixelSize` matches your target atlas
-3. **Test resolution level**: Try different levels on a single file first
+3. **Confirm resolution level**: Ensure `resolutionLevel` exists in the image
 
 ### After Completion
 - Verify output files are created correctly
@@ -102,29 +96,6 @@ resolutionLevel = 3;
 - Confirm voxel size matches target (`endPixelSize`)
 - Visually inspect a few processed images for quality
 
-## Troubleshooting
-
-### Common Issues
-
-1. **"Could not open file" errors**
-   - **Cause**: Corrupted .ims files or insufficient memory
-   - **Solution**: Check file integrity, increase ImageJ memory allocation
-
-2. **Wrong voxel size in output**
-   - **Cause**: Incorrect `endPixelSize` or missing metadata
-   - **Solution**: Verify atlas specifications, check original file metadata
-
-3. **Empty or black images**
-   - **Cause**: Wrong channel number or very low signal
-   - **Solution**: Check channel contents in original file, adjust channel parameter
-
-4. **Out of memory errors**
-   - **Cause**: Large files, insufficient RAM allocation
-   - **Solution**: Increase ImageJ memory limit, use higher resolution level
-
-5. **Interpolation artifacts**
-   - **Cause**: Extreme scaling ratios
-   - **Solution**: Choose appropriate resolution level, consider different interpolation methods
 
 ## Manual Process Alternative
 
@@ -133,8 +104,7 @@ If you need to rescale images manually instead of using the automated macro, fol
 ### Manual Rescaling in ImageJ/Fiji
 
 1. **Open the .ims file**:
-    - Go to `File → Import → Bio-Formats`
-    - Navigate to your `.ims` file
+    - Drag and drop your `.ims` file to ImageJ
     - In the Bio-Formats Import Options dialog, select the appropriate series/resolution level
     - Click OK to open the image
 
@@ -186,11 +156,36 @@ After running this macro:
 - **Output**: `processed_*.tif` files for registration pipeline
 - **Following step**: Manual registration in Napari (Step 2 of pipeline)
 
+
+## Troubleshooting
+
+### Common Issues
+
+1. **"Could not open file" errors**
+   - **Cause**: Corrupted .ims files or insufficient memory
+   - **Solution**: Check file integrity, increase ImageJ memory allocation
+
+2. **Wrong voxel size in output**
+   - **Cause**: Incorrect `endPixelSize` or missing metadata
+   - **Solution**: Verify atlas specifications, check original file metadata
+
+3. **Empty or black images**
+   - **Cause**: Wrong channel number or very low signal
+   - **Solution**: Check channel contents in original file, adjust channel parameter
+
+4. **Out of memory errors**
+   - **Cause**: Large files, insufficient RAM allocation
+   - **Solution**: Increase ImageJ memory limit, use higher resolution level
+
+5. **Interpolation artifacts**
+   - **Cause**: Extreme scaling ratios
+   - **Solution**: Choose appropriate resolution level, consider different interpolation methods
+
+
 ## Technical Notes
 
 ### Coordinate System
-- ImageJ uses (X, Y, Z) coordinate system
-- Scaling preserves spatial relationships
+- The total size of the image in um is preserved, only the voxel size and voxel count changes
 - Maintains original image orientation
 
 
