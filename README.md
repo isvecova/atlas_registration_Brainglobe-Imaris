@@ -69,7 +69,7 @@ Restart Imaris.
 5. Click **Run**
 6. If registration misaligned, try changing *Smoothing sigma* to `0`, and optimize other parameters
 
-## 2. Mask Processing (Python script)
+## 2. Mask processing (Python script)
 
 **[Detailed Documentation](docs/01_mask_processing_pipeline_documentation.md)**
 
@@ -102,7 +102,7 @@ python mask_processing_pipeline.py
 
 6. The script will output the processed mask (adjusted\_mask.tiff) in the same folder.
 
-## 3. Import and Label in Imaris
+## 3. Import brain regions to Imaris (Custom Imaris XTension)
 
 **[Detailed Documentation](docs/XT_ImportBrainRegionIdentificators_documentation.md)**
 
@@ -155,7 +155,7 @@ This approach is useful if you want to work with a smaller image first and trans
 
 ## Author
 
-Iva Švecová, Institute of Experimental Medicine
+Iva Švecová, Institute of Experimental Medicine (iva.svecova@iem.cas.cz)
 
 ---
 
