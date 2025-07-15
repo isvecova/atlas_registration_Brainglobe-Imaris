@@ -1,3 +1,13 @@
+'''
+Author: Iva Svecova (svecovaiva01@gmail.com), 2025
+Licensed under the Creative Commons Attribution 4.0 (CC BY 4.0) — see <https://creativecommons.org/licenses/by/4.0/>
+May be used, modified, and redistributed, provided attribution to the author is retained.
+Supplied “as is”, without warranties or liability.
+'''
+
+# THIS SCRIPT CONTAINS HELPER FUNCTIONS FOR THE 01_mask_processing_pipeline.py
+# It is not meant to be run directly, but rather used in the main processing script.
+
 import numpy as np
 import pandas as pd
 from scipy.ndimage import label

@@ -1,4 +1,4 @@
-# ImageJ Rescale Macro Documentation (`00a_rescaleMacroBatch.ijm`/`00b_rescaleMacro.ijm`)
+# ImageJ rescale macro documentation (`00a_rescaleMacroBatch.ijm`/`00b_rescaleMacro.ijm`)
 
 ## Overview
 
@@ -13,9 +13,9 @@ The macro serves as the first step in the brain atlas registration pipeline, pre
 
 ## Parameters
 
-### User-Configurable Parameters
+### User-configurable parameters
 
-```javascript
+```java
 // Specify the channel that contains autofluorescence information: 
 channel = 2;
 
@@ -43,12 +43,13 @@ resolutionLevel = 3;
    - **Purpose**: Specifies which pyramid level to load from the `.ims` file
    - **Default**: `3`
    - **How to choose**:
+     - Make sure that the selected resolution level is available in the dataset.
      - Higher numbers = lower resolution, faster processing
      - Lower numbers = higher resolution, slower processing
      - Choose based on: `original_resolution × 2^(resolutionLevel-1) ≈ endPixelSize`
      - Example: If original = 2.5 μm and target = 20 μm, use level 3 (2.5 × 2² = 10 μm ≈ 20 μm)
 
-## Input Requirements
+## Input requirements
 
 ### File Format
 - **Required**: `.ims` files (Imaris format)
@@ -61,7 +62,7 @@ resolutionLevel = 3;
 - **Resolution**: Should have multiple pyramid levels, has to contain the resolution level indicated by `resolutionLevel` parameter
 ## Output
 
-### Generated Files
+### Generated files
 - **Format**: `.tif`
 - **Naming**: `processed_[original_name].tif`
 - **Location**: Same folder as input files
@@ -69,9 +70,9 @@ resolutionLevel = 3;
   - Single channel (specified channel only)
   - Isotropic and atlas-matched voxel size
 
-## Usage Guidelines
+## Usage guidelines
 
-### How to Run the Macro
+### How to run the macro
 
 1. **Prerequisites**:
     - Install [ImageJ](https://imagej.nih.gov/ij/download.html) or [Fiji](https://fiji.sc/) (recommended)
@@ -85,23 +86,23 @@ resolutionLevel = 3;
     - Select the `00a_rescaleMacroBatch.ijm` file
     - Follow the folder selection prompt
 
-### Before Running
+### Before running
 1. **Verify channel assignment**: Check which channel contains autofluorescence
 2. **Confirm atlas specifications**: Ensure `endPixelSize` matches your target atlas
 3. **Confirm resolution level**: Ensure `resolutionLevel` exists in the image
 
-### After Completion
+### After completion
 - Verify output files are created correctly
 - Check image properties in ImageJ: `Image → Properties`
 - Confirm voxel size matches target (`endPixelSize`)
 - Visually inspect a few processed images for quality
 
 
-## Manual Process Alternative
+## Manual process alternative
 
 If you need to rescale images manually instead of using the automated macro, follow these steps:
 
-### Manual Rescaling in ImageJ/Fiji
+### Manual rescaling in ImageJ/Fiji
 
 1. **Open the .ims file**:
     - Drag and drop your `.ims` file to ImageJ
@@ -143,69 +144,43 @@ If you need to rescale images manually instead of using the automated macro, fol
     - Save in the same folder as the original for consistency
 
 
-## Integration with Pipeline
+## Integration with pipeline
 
-### Next Steps
+### Next steps
 After running this macro:
-1. **Quality Check**: Verify processed images in ImageJ or Napari
+1. **Quality check**: Verify processed images in ImageJ or Napari
 2. **Registration**: Use processed `.tif` files in Napari with BrainGlobe
-3. **Orientation**: Check and correct image orientation before registration
 
 ### File Dependencies
 - **Input**: Original `.ims` files from microscopy
 - **Output**: `processed_*.tif` files for registration pipeline
-- **Following step**: Manual registration in Napari (Step 2 of pipeline)
+- **Following step**: Manual registration using BrainGlobe
 
 
-## Troubleshooting
+## Technical notes
 
-### Common Issues
-
-1. **"Could not open file" errors**
-   - **Cause**: Corrupted .ims files or insufficient memory
-   - **Solution**: Check file integrity, increase ImageJ memory allocation
-
-2. **Wrong voxel size in output**
-   - **Cause**: Incorrect `endPixelSize` or missing metadata
-   - **Solution**: Verify atlas specifications, check original file metadata
-
-3. **Empty or black images**
-   - **Cause**: Wrong channel number or very low signal
-   - **Solution**: Check channel contents in original file, adjust channel parameter
-
-4. **Out of memory errors**
-   - **Cause**: Large files, insufficient RAM allocation
-   - **Solution**: Increase ImageJ memory limit, use higher resolution level
-
-5. **Interpolation artifacts**
-   - **Cause**: Extreme scaling ratios
-   - **Solution**: Choose appropriate resolution level, consider different interpolation methods
-
-
-## Technical Notes
-
-### Coordinate System
+### Coordinate system
 - The total size of the image in um is preserved, only the voxel size and voxel count changes
 - Maintains original image orientation
 
 
-## Workflow Details
+## Workflow details
 
 ### Step-by-Step Process:
 
-1. **Folder Selection**
-   ```javascript
+1. **Folder selection**
+   ```java
    folder = getDirectory("Choose folder with .ims files");
    ```
    - User selects input folder containing `.ims` files
    - All `.ims` files in the folder will be processed
 
-2. **File Processing Loop**
+2. **File processing loop**
    - Iterates through all files in the selected folder
    - Processes only files with `.ims` extension
 
-3. **Image Loading**
-   ```javascript
+3. **Image loading**
+   ```java
    run("Bio-Formats Importer", 
        "open=[" + filePath + "] " +
        "series_list=" + resolutionLevel + " " +
@@ -214,15 +189,15 @@ After running this macro:
    - Uses Bio-Formats to open specific resolution level
    - Maintains original image properties and metadata
 
-4. **Channel Extraction**
-   ```javascript
+4. **Channel extraction**
+   ```java
    run("Duplicate...", "title=processed duplicate channels=" + channel);
    ```
    - Duplicates only the specified channel
    - Closes the original multi-channel image to save memory
 
-5. **Rescaling Calculation**
-   ```javascript
+5. **Rescaling calculation**
+   ```java
    getPixelSize(unit, pixelWidth, pixelHeight, voxelDepth);
    rescaleXY = pixelWidth / endPixelSize;
    rescaleZ = voxelDepth / endPixelSize;
@@ -231,22 +206,18 @@ After running this macro:
    - Calculates scaling factors for X, Y, and Z dimensions
    - Handles anisotropic voxels correctly
 
-6. **Image Rescaling**
-   ```javascript
+6. **Image rescaling**
+   ```java
    run("Scale...", "x=" + rescaleXY + " y=" + rescaleXY + " z=" + rescaleZ + 
        " interpolation=Bilinear average process create title=rescaled");
    ```
-   - **Interpolation**: Bilinear (good balance of speed and quality)
-   - **Average**: Maintains intensity relationships during downsampling
-   - **Process**: Applies to entire stack
-   - **Create**: Generates new image, preserving original
+   - Rescales the image to match the specified voxel size
 
-7. **File Saving**
-   ```javascript
+7. **File saving**
+   ```java
    originalName = substring(list[i], 0, lengthOf(list[i]) - 4); // Remove ".ims"
    savePath = folder + "processed_" + originalName + ".tif";
    saveAs("Tiff", savePath);
    ```
    - Saves as TIFF format for compatibility
    - Adds "processed_" prefix to distinguish from originals
-   - Maintains original filename structure

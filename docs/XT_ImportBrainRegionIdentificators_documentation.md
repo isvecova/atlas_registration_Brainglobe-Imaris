@@ -12,81 +12,97 @@ The XTension bridges the gap between BrainGlobe atlas registration and Imaris vi
 ## Installation
 
 ### Prerequisites
-- **Imaris Version**: 10.x or later with XTension support (compatibility with earlier versions not verified)
-- **MATLAB Integration**: Imaris MATLAB interface enabled, Matlab Runtime installed
+- **Imaris version**: 10.x or later with XTension support (tested on 10.2, compatibility with earlier versions not verified)
+- **MATLAB integration**: Imaris MATLAB interface enabled, Matlab Runtime installed
 
-### Installation Steps
+### Installation steps
 
-1. **Locate XTensions Folder** in Preferences - CustomTools - XTension Folders
+1. **Locate XTensions folder** in Preferences - CustomTools - XTension Folders
 
-2. **Copy XTension File**
+2. **Copy XTension file**
    ```
    Copy: XT_ImportBrainRegionIdentificators.m
    To: [Imaris XTensions folder]
    ```
 
-3. **Verify Installation**
+3. **Verify installation**
    - Restart Imaris
    - Check: Image Processing menu → "Brain region identificators import"
    - Check: Surfaces tab → XTension menu → "Brain region identificators import"
 
-### Custom Installation Path
+### Custom installation path
 If using a custom XTensions folder:
 1. Open Imaris → Preferences → CustomTools
 2. Set custom path
 3. Copy XTension file to custom location
 4. Restart Imaris
 
-## User Interface
+## Usage guidelines
+1. Open original `.ims` file
+2. Go to:
+   ```
+   Import → Import Segmentation/Label
+   ```
+   and select the adjusted mask → This creates new surfaces
 
-### Dialog Sequence
+   IMPORTANT: The mask cannot be 32-bit, otherwise the loading gets stuck.
+3. Select the surfaces object, in **XTension** tab → Run *Brain region identificators import*
+4. When prompted, provide:
+   - `adjusted_mask.tif` (the adjusted mask that was loaded in the previous step)
+   - `used_region_ids.csv` (a CSV file with two columns: `region_id` for the numeric region identifiers and `region_name` for the corresponding anatomical names)&#x20;
+5. Wait for label import to finish (may take a few minutes)
 
-#### Dialog 1: Mask File Selection
-```
-Title: "Select the brain atlas mask"
-Filter: *.tif, *.tiff
-Purpose: Select the same mask file used to create surfaces
-```
+### Alternative import to Imaris
 
-#### Dialog 2: CSV File Selection
-```
-Title: "Select the csv file containing region IDs and corresponding names"  
-Filter: *.csv
-Purpose: Select region mapping file from mask processing pipeline
-```
+In case of big datasets, the import of identifiers can get stuck. In that case, you can use a workaround. Instead of opening the original `.ims` file, you can use the downsampled `.tiff` file directly:
 
-## Input Requirements
+1. Open the downsampled `.tiff` file in Imaris.
+   - It will be automatically converted to `.ims` format.
+2. Use the same mask import procedure as described above:
+   ```
+   Import → Import Segmentation/Label
+   ```
+   - This creates new surfaces.
+3. Run the *Brain region identificators import* XTension on the surfaces.
+4. When prompted, provide:
+   - `adjusted_mask.tif`
+   - `used_region_ids.csv`
+5. Once the labels are imported, export the scene via:
+   ```
+   File → Export Scene
+   ```
+6. Open the original `.ims` file.
+7. Import the previously exported scene using:
+   ```
+   File → Import Scene → Add to existing objects
+   ```
+8. Important: Before importing, make sure the voxel origin of the image (minimum µm) is set to **0** in all dimensions. Otherwise, the imported surfaces may be shifted.
 
-### 1. Surfaces Object
+This approach is useful if you want to work with a smaller image first and transfer results back to the full-resolution dataset.
+
+## Input requirements
+
+### 1. Surfaces object
 **Prerequisites**:
 - Must be created using "Import → Import Segmentation/Label"
 - Must be generated from the same mask file selected in Dialog 1
 - Should contain multiple surface objects representing brain regions
 
-**Validation**:
-```matlab
-if vImarisApplication.GetFactory.IsSurfaces(vSurpassComponent)
-    vSurfaces = vImarisApplication.GetFactory.ToSurfaces(vSurpassComponent);
-else
-    msgbox('Please select a Surface object created from a label image.');
-    return;
-end
-```
 
-### 2. Mask TIFF File
-**Required Properties**:
+### 2. Mask TIFF file
+**Required properties**:
 - **Format**: 3D TIFF (single or multi-page)
-- **Data Type**: 16-bit integer (uint16)
+- **Data type**: 16-bit integer (uint16)
 - **Content**: Labeled regions with unique IDs
 - **Dimensions**: Must match surface object dimensions
-- **Coordinate System**: Must align with Imaris dataset
+- **Coordinate system**: Must align with Imaris dataset
 
-**File Examples**:
+**File examples**:
 - `adjusted_mask.tiff` (from mask processing pipeline)
 - `registered_atlas_original_orientation.tiff` (original BrainGlobe output - NOT IN 16-BIT FORMAT!)
 
-### 3. CSV Mapping File
-**Required Columns**:
+### 3. CSV mapping file
+**Required columns**:
 ```csv
 region_id,region_name
 1,Isocortex
@@ -94,19 +110,36 @@ region_id,region_name
 3,Thalamus
 ```
 
-**Column Specifications**:
+**Column specifications**:
 - **`region_id`** (integer): Must match IDs in mask file
 - **`region_name`** (string): Human-readable anatomical names
 
-**File Examples**:
+**File examples**:
 - `used_region_ids.csv` (from mask processing pipeline)
 - Custom mapping files with same format
 
-## Technical Implementation
 
-### Coordinate System Mapping
+## Integration with pipeline
 
-#### Imaris to Mask Conversion
+### Workflow position
+The XTension is used in step 3 of the pipeline:
+1. **ImageJ**: Rescale images → `processed_*.tif`
+    
+    **Napari/BrainGlobe**: Register to atlas → `registered_atlas_original_orientation.tiff`
+2. **Python**: Process mask → `adjusted_mask.tiff`, `used_region_ids.csv`
+3. **Imaris**: Import mask, run XTension → Labeled surfaces
+
+### File dependencies
+- **Input 1**: Surfaces object (created from mask import)
+- **Input 2**: `adjusted_mask.tiff` (same file used for surface creation)
+- **Input 3**: `used_region_ids.csv` (from mask processing pipeline)
+- **Output**: Labeled surfaces with region statistics
+
+## Detailed script description
+
+### Coordinate system mapping
+
+#### Imaris to mask conversion
 ```matlab
 % Get dataset extents
 vMinX = 0; vMinY = 0; vMinZ = 0;
@@ -120,7 +153,7 @@ vSizeY = vMaskSize(1);  % MATLAB uses (Y,X,Z) order
 vSizeZ = vMaskSize(3);
 ```
 
-#### Coordinate Transformation
+#### Coordinate transformation
 Imaris uses physical coordinates (μm), while masks use voxel indices:
 ```matlab
 % Convert surface mask to voxel coordinates
@@ -129,9 +162,9 @@ vMaskDataSet = vSurfaces.GetSingleMask(i-1, vMinX, vMinY, vMinZ,
                                        vSizeX, vSizeY, vSizeZ);
 ```
 
-### Surface Processing Algorithm
+### Surface processing algorithm
 
-#### 1. Surface Iteration
+#### 1. Surface iteration
 ```matlab
 for i = 1:vNumSurfaces
     % Process each surface individually
@@ -140,7 +173,7 @@ for i = 1:vNumSurfaces
     maskIndices = find(uint8(vRaw));
 ```
 
-#### 2. Coordinate Conversion
+#### 2. Coordinate conversion
 ```matlab
 % Convert linear indices to 3D coordinates
 [xx, yy, zz] = ind2sub([vSizeX, vSizeY, vSizeZ], maskIndices);
@@ -151,7 +184,7 @@ validMask = (xx >= 1 & xx <= size(vLabelImage,2) & ...
             zz >= 1 & zz <= size(vLabelImage,3));
 ```
 
-#### 3. Sampling Optimization
+#### 3. Sampling optimization
 For large surfaces, the XTension samples a subset of points:
 ```matlab
 maxSampleSize = 5000;  % Adjustable parameter
@@ -163,7 +196,7 @@ if length(xx) > maxSampleSize
 end
 ```
 
-#### 4. Region ID Detection
+#### 4. Region ID detection
 ```matlab
 % Extract region IDs from mask
 linearIndices = sub2ind(size(vLabelImage), yy, xx, zz);
@@ -174,9 +207,9 @@ labels = labels(labels > 0);  % Remove background
 regionId = mode(labels);
 ```
 
-### Label Assignment
+### Label assignment
 
-#### Surface Labels
+#### Surface labels
 ```matlab
 vLabel = vImarisApplication.GetFactory.CreateObjectLabel(i-1, "Brain region", regionName);
 vDataItem.SetLabel(vLabel);
@@ -185,7 +218,7 @@ vDataItem.SetLabel(vLabel);
 - **Content**: Human-readable anatomical name
 - **Visibility**: Appears in Imaris object browser
 
-#### Statistics Integration
+#### Statistics integration
 ```matlab
 vSurfaces.AddStatistics(vNames, vLabelIds, vUnits, vFactors, vFactorNames, vIds);
 ```
@@ -194,106 +227,13 @@ vSurfaces.AddStatistics(vNames, vLabelIds, vUnits, vFactors, vFactorNames, vIds)
 - **Category**: "Surface" 
 - **Usage**: Quantitative analysis and filtering
 
-#### Expected Results
-- **Surface Labels**: All surfaces should have "Brain region" labels
+#### Expected results
+- **Surface labels**: All surfaces should have "Brain region" labels
 - **Statistics**: "Region ID" column should appear in Statistics tab
 - **Completeness**: Number of labeled surfaces should match input
 
-#### Common Issues and Solutions
 
-##### 1. Misaligned Coordinates
-**Symptoms**: 
-- Many "Unknown" regions
-- Incorrect region assignments
-- Empty surface labels
-
-**Causes**:
-- Different voxel sizes between mask and dataset
-- Coordinate system mismatch
-- Incorrect mask file selection
-
-**Solutions**:
-- Verify mask and dataset have same voxel size
-- Check that mask was used to create surfaces
-- Ensure consistent coordinate origins
-
-##### 2. Missing Region Names
-**Symptoms**:
-- Surfaces labeled as "Unknown"
-- Partial labeling success
-
-**Causes**:
-- Incomplete CSV file
-- ID mismatches between mask and CSV
-- CSV formatting errors
-
-**Solutions**:
-- Verify all mask IDs are in CSV
-- Check CSV column names and format
-- Validate region ID consistency
-
-##### 3. Performance Issues
-**Symptoms**:
-- Very slow processing
-- Memory errors
-- Imaris becomes unresponsive
-
-**Causes**:
-- Too many surfaces (>1000)
-- Very large surfaces
-- Insufficient system memory
-
-**Solutions**:
-- Simplify mask before surface creation
-- Increase sampling threshold (`maxSampleSize`)
-- Close other applications to free memory
-
-## Integration with Pipeline
-
-### Workflow Position
-The XTension is used in Step 4 of the complete pipeline:
-1. **ImageJ**: Rescale images → `processed_*.tif`
-2. **Napari/BrainGlobe**: Register to atlas → `registered_atlas_original_orientation.tiff`
-3. **Python**: Process mask → `adjusted_mask.tiff`, `used_region_ids.csv`
-4. **Imaris**: Import mask, run XTension → Labeled surfaces
-
-### File Dependencies
-- **Input 1**: Surfaces object (created from mask import)
-- **Input 2**: `adjusted_mask.tiff` (same file used for surface creation)
-- **Input 3**: `used_region_ids.csv` (from mask processing pipeline)
-- **Output**: Labeled surfaces with region statistics
-
-### Subsequent Analysis
-After running the XTension:
-- **Quantitative Analysis**: Use "Region ID" statistics for measurements
-- **Visualization**: Toggle surface visibility by anatomical name
-- **Export**: Export labeled scenes for documentation
-- **Further Processing**: Use region assignments for custom analysis
-
-## Troubleshooting Guide
-
-### Error Messages and Solutions
-
-#### "Please select a Surface object created from a label image"
-- **Cause**: Wrong object type selected
-- **Solution**: Select surfaces object in Surpass tree, not other object types
-
-#### "Failed to read TIFF. Ensure it is a 3D label image"
-- **Cause**: Corrupted or incompatible TIFF file
-- **Solution**: Verify TIFF file integrity, check bit depth (should be 16-bit)
-
-#### "CSV must contain columns: region_id, region_name"
-- **Cause**: Incorrect CSV format or column names
-- **Solution**: Verify CSV has exact column names (case-insensitive)
-
-#### Processing stuck or very slow
-- **Cause**: Too many surfaces or very large surfaces
-- **Solution**: Confirm processing with dialog, wait for completion, or simplify mask
-
-
-## Technical Reference
-
-### MATLAB Interface Functions Used
+### MATLAB interface functions used
 - `vImarisApplication.GetSurpassSelection()`: Get selected object
 - `vImarisApplication.GetFactory.IsSurfaces()`: Validate object type
 - `vSurfaces.GetSingleMask()`: Extract surface geometry
@@ -301,7 +241,7 @@ After running the XTension:
 - `vSurfaces.AddStatistics()`: Add custom statistics
 - `vImarisApplication.GetFactory.CreateObjectLabel()`: Create labels
 
-### File I/O Functions
+### File I/O functions
 - `tiffreadVolume()`: Read 3D TIFF files
 - `readtable()`: Parse CSV files
 - `uigetfile()`: File selection dialogs

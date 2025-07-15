@@ -1,3 +1,10 @@
+'''
+Author: Iva Svecova (svecovaiva01@gmail.com), 2025
+Licensed under the Creative Commons Attribution 4.0 (CC BY 4.0) — see <https://creativecommons.org/licenses/by/4.0/>
+May be used, modified, and redistributed, provided attribution to the author is retained.
+Supplied “as is”, without warranties or liability.
+'''
+
 import tifffile
 from brainglobe_atlasapi import BrainGlobeAtlas
 from scipy.ndimage import generate_binary_structure

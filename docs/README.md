@@ -1,10 +1,10 @@
 # Brain Atlas Registration Documentation
 
-This directory contains detailed documentation for all scripts and components in the Brain Atlas Registration pipeline using BrainGlobe and Imaris.
+This directory contains detailed documentation for all scripts and components in the Brain Atlas registration pipeline using BrainGlobe and Imaris.
 
-## Documentation Structure
+## Documentation structure
 
-### Script Documentation
+### Script documentation
 
 - **[ImageJ Rescale Macro](00_rescaleMacro_documentation.md)** (`00a_rescaleMacroBatch.ijm`/`00b_rescaleMacro.ijm`)
   - Batch processing of multiple `.ims` files (`00a_rescaleMacroBatch.ijm`) or single file (`00b_rescaleMacro.ijm`)
@@ -16,20 +16,16 @@ This directory contains detailed documentation for all scripts and components in
   - Region simplification and cleanup
   - Output file generation and validation
 
-- **[Mask Processing Functions](mask_processing_functions_documentation.md)** (`mask_processing_functions.py`)
-  - Detailed function reference
-  - Implementation details and algorithms
-
 - **[Imaris XTension](XT_ImportBrainRegionIdentificators_documentation.md)** (`XT_ImportBrainRegionIdentificators.m`)
   - Brain region label import for Imaris
   - Installation and configuration
 
-## Quick Reference
+## Quick reference
 
 ### Pipeline Overview
 1. **Rescaling** (ImageJ) → Convert images to atlas resolution
   **Registration** (Napari/BrainGlobe) → Align images to atlas
-2. **Mask rocessing** (Python) → Simplify and clean masks
+2. **Mask processing** (Python) → Simplify and clean masks
 3. **Imaris import and visualization** (Imaris) → Import and label brain regions
 
 ### Key File Formats

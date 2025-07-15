@@ -1,4 +1,9 @@
-// Batch version - this script will process all .ims files in a user-selected folder
+// Batch version of rescale macro - this script will process all .ims files in a user-selected folder
+
+// Author: Iva Svecova (svecovaiva01@gmail.com), 2025
+// Licensed under the Creative Commons Attribution 4.0 (CC BY 4.0) — see <https://creativecommons.org/licenses/by/4.0/>
+// May be used, modified, and redistributed, provided attribution to the author is retained.
+// Supplied “as is”, without warranties or liability.
 
 // ============== PARAMETERS TO SPECIFY BEFORE RUNNING THE SCRIPT: ==============
 

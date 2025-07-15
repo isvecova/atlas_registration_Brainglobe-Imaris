@@ -1,4 +1,9 @@
-// Single file version - this script will process a single user-selected file at the time
+// Single file version of rescale macro - this script will process a single user-selected file at the time
+
+// Author: Iva Svecova (svecovaiva01@gmail.com), 2025
+// Licensed under the Creative Commons Attribution 4.0 (CC BY 4.0) — see <https://creativecommons.org/licenses/by/4.0/>
+// May be used, modified, and redistributed, provided attribution to the author is retained.
+// Supplied “as is”, without warranties or liability.
 
 // ============== PARAMETERS TO SPECIFY BEFORE RUNNING THE SCRIPT: ==============
 

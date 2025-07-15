@@ -10,11 +10,11 @@ This repository contains a pipeline for registering Imaris .ims brain images to 
 
 ## &#x20;Requirements
 
-- [ImageJ / Fiji](https://fiji.sc/) ([Schindelin et al., 2012](https://doi.org/10.1038/nmeth.2019)) - part 1
-- [Miniconda](https://docs.conda.io/en/latest/miniconda.html) - part 1 and 2
-- [Python 3.12](https://www.python.org/) - part 1 and 2
-- [BrainGlobe](https://brainglobe.info/) ([Claudi et al., 2021](https://joss.theoj.org/papers/10.21105/joss.02668); [Tyson et al., 2022](https://doi.org/10.1038/s41598-021-04676-9)) - part 1 and 2
-- [Imaris](https://imaris.oxinst.com/) (with XTension support) - part 3
+- [ImageJ / Fiji](https://fiji.sc/) ([Schindelin et al., 2012](https://doi.org/10.1038/nmeth.2019)) - for part 1
+- [Miniconda](https://docs.conda.io/en/latest/miniconda.html) - for part 1 and 2
+- [Python 3.12](https://www.python.org/) - for part 1 and 2
+- [BrainGlobe](https://brainglobe.info/) ([Claudi et al., 2021](https://joss.theoj.org/papers/10.21105/joss.02668); [Tyson et al., 2022](https://doi.org/10.1038/s41598-021-04676-9)) - for part 1 and 2
+- [Imaris](https://imaris.oxinst.com/) (with XTension support) - for part 3
 
 ---
 
@@ -32,7 +32,7 @@ For more detailed description, follow information on the BrainGlobe webpage: [h
 
 ### 2. Install the provided Imaris XTension (required for import of brain region names and IDs to Imaris)
 
-Copy the `XT_BrainAtlasLabelImport.py` to your Imaris XTensions folder, such as:
+Copy the `XT_ImportBrainRegionIdentificators.py` to your Imaris XTensions folder, such as:
 
 ```
 C:\Users\<YourUsername>\Documents\Imaris\XTensions
@@ -49,17 +49,19 @@ Restart Imaris.
 
 **[Detailed Documentation](docs/00_rescaleMacro_documentation.md)**
 
-1. Open the macro script (`00a_rescaleMacro.ijm`) in Fiji. Alternatively, if you want to process more files at once, open the batch script option (`00b_rescaleMacroBatch.ijm`)
+Rescaling is included for easier handling of large datasets. (such as in case of lightsheet data)
+
+1. Open the macro script in Fiji. If you want to process more files at once, open the batch script option (`00a_rescaleMacro.ijm`), otherwise, use the second option that will process a single image (`00b_rescaleMacro.ijm`)
 2. In the macro, adjust parameters if needed.
 3. Run the macro.
 
 ### Registration (manually in Napari + BrainGlobe)
 
-1. Open Napari and drag the `.tiff` image (use 'napari defaults' reader, if asked).
+1. Open Napari and drag the `.tiff` image (use 'napari builtins' reader, if asked).
 2. Download the atlas if needed via brainrender → *Manage atlas versions*
 3. Open **brainreg** plugin
 4. Configure:
-   - **Atlas**: `perens_lsmf_mouse_20um`
+   - **Atlas**: `perens_lsmf_mouse_20um` suitable for lightsheet data, or other selected
    - **Orientation**: Use *Check Orientation* tool ([docs](https://brainglobe.info/documentation/brainreg/user-guide/checking-orientation.html))
    - **Region**: Full brain or left/right hemisphere
    - **Voxel size**: \~20 µm (check in Fiji: *Image → Properties*)
@@ -73,40 +75,42 @@ Restart Imaris.
 
 **[Detailed Documentation](docs/01_mask_processing_pipeline_documentation.md)**
 
-1. Open `01_mask_processing_pipeline.py`
+The processing adjusts the level of detail, discards small regions and converts the mask to 16-bit, which is needed for loading to Imaris. 
+
+1. Open `01_mask_processing_pipeline.py` in any text or code editor.
 2. If needed, adjust parameters, such as the list of regions to flatten.
 3. Run the script. 
 
 You can run the script from the Anaconda Prompt as follows:
 
-1. Open the Anaconda Prompt.
-2. Activate the BrainGlobe environment:
+- Open the Anaconda Prompt.
+- Activate the BrainGlobe environment:
 
-```bash
-conda activate brainglobe_env
-```
+   ```bash
+   conda activate brainglobe_env
+   ```
 
-3. Navigate to the folder containing the script:
+- Navigate to the folder containing the script:
 
-```bash
-cd path/to/your/script
-```
+   ```bash
+   cd path/to/your/script
+   ```
 
-4. Run the script:
+- Run the script:
 
-```bash
-python mask_processing_pipeline.py
-```
+   ```bash
+   python mask_processing_pipeline.py
+   ```
 
-5. When prompted, select the original mask path.
+4. When prompted, select the original mask path.
 
-6. The script will output the processed mask (adjusted\_mask.tiff) in the same folder.
+. The script will output the processed mask (adjusted\_mask.tiff) in the same folder.
 
 ## 3. Brain region import to Imaris (Custom Imaris XTension)
 
 **[Detailed Documentation](docs/XT_ImportBrainRegionIdentificators_documentation.md)**
 
-**IMPORTANT:** If you want to directly import masks from BrainGlobe to Imaris without using the script from part 2, make sure to convert the mask to 16-bit before using hte Import Segmentation/Label function. If you attempt importing a 32-bit mask, Imaris apparently gets stuck.
+**IMPORTANT:** If you want to directly import masks from BrainGlobe to Imaris without using the script from part 2, make sure to convert the mask to 16-bit before using hte Import Segmentation/Label function. If you attempt importing a 32-bit mask, Imaris seems to get stuck.
 
 1. Open original `.ims` file
 2. Go to:
@@ -116,7 +120,7 @@ python mask_processing_pipeline.py
    and select the adjusted mask → This creates new surfaces
 
    IMPORTANT: The mask cannot be 32-bit, otherwise the loading gets stuck.
-3. Select the surfaces object, in **XTension** tab → Run *Brain atlas label import*
+3. Select the surfaces object, in **XTension** tab → Run *Brain region identificators import*
 4. When prompted, provide:
    - `adjusted_mask.tif` (the adjusted mask that was loaded in the previous step)
    - `used_region_ids.csv` (a CSV file with two columns: `region_id` for the numeric region identifiers and `region_name` for the corresponding anatomical names)&#x20;
@@ -134,7 +138,7 @@ In case of big datasets, the import of identifiers can get stuck. In that case, 
    Import → Import Segmentation/Label
    ```
    - This creates new surfaces.
-3. Run the *Brain atlas label import* XTension on the surfaces.
+3. Run the *Brain region identificators import* XTension on the surfaces.
 4. When prompted, provide:
    - `adjusted_mask.tif`
    - `used_region_ids.csv`
