@@ -157,9 +157,11 @@ This approach is useful if you want to work with a smaller image first and trans
 
 ---
 
-## Author
+## Author & Citation
 
 Iva Švecová, Institute of Experimental Medicine (iva.svecova@iem.cas.cz)
+
+If you use this code, please cite the repository using the following DOI: [![DOI](https://zenodo.org/badge/1005671457.svg)](https://doi.org/10.5281/zenodo.15916210)
 
 ---
 
