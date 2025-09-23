@@ -147,12 +147,12 @@ def create_label_mapping(mask, atlas, new_id_to_old_id):
     for region_id in final_ids:
         if region_id == 0:
             continue
-        if region_id in atlas_id_to_info:
-            info = atlas_id_to_info[region_id]
-        elif region_id in new_id_to_old_id:
+        if region_id in new_id_to_old_id:
             old_id = new_id_to_old_id[region_id]
             info = atlas_id_to_info.get(old_id, {"name": f"Remapped_{old_id}", "acronym": f"Remapped_{old_id}"})
             # If the id is found in the remap, use the old id's info, otherwise use a default name and acronym
+        elif region_id in atlas_id_to_info:
+            info = atlas_id_to_info[region_id]
         else:
             info = {"name": f"Unknown_{region_id}", "acronym": f"Unknown_{region_id}"}
         id_to_label.append({"region_id": region_id, "region_name": info["name"], "region_acronym": info["acronym"]})
