@@ -13,6 +13,7 @@ from mask_processing_functions import (
     flatten_regions,
     flatten_descendants_of_level,
     exclude_regions,
+    exclude_all_but_specified,
     remove_small_fragments,
     remap_large_values,
     create_label_mapping,
@@ -41,6 +42,12 @@ regions_to_exclude = ["fiber tracts", "root"]
 # tracks mask is very thin in some parts -> Imaris segments it into many disconnected fragments; root is a parent region that does not really give any information
 # these regions will be set to 0 in the final mask
 
+# ALTERNATIVE OPTION: 
+# You can keep only keep a defined subset of regions, and set all other regions to 0
+keep_specified_only = False    # Set to True to use the included_regions list
+included_regions = ["OLF"]  # Only the regions specified and their subregions will be kept if keep_specified_only is True
+# Unless these regions are added to region_to_flatten, they will be still be subdivided into smaller regions in the final mask
+
 # === STEP 0: Prompt user to select folder with dataset ===
 path = askdirectory(title='Select Folder') # shows dialog box and return the path
 if not path:
@@ -63,8 +70,12 @@ whole_brain_mask = create_whole_brain_mask(mask)
 
 # === STEP 3: Simplify Mask ===
 print("Simplifying mask...")
+if keep_specified_only:
+    simplified_mask = exclude_all_but_specified(mask, atlas, included_regions)
+else:
+    simplified_mask = mask
 # Flatten specified regions
-simplified_mask = flatten_regions(mask, atlas, regions_to_flatten)
+simplified_mask = flatten_regions(simplified_mask, atlas, regions_to_flatten)
 # Flatten children of listed parent regions
 simplified_mask = flatten_descendants_of_level(simplified_mask, atlas, regions_to_flatten_on_level_1, level=1)
 simplified_mask = exclude_regions(simplified_mask, atlas, regions_to_exclude)

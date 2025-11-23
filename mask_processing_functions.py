@@ -90,6 +90,28 @@ def exclude_regions(mask, atlas, region_acronyms):
     return modified_mask
 
 
+def exclude_all_but_specified(mask, atlas, included_region_acronyms):
+    # Exclude all regions from the mask except for the specified ones by setting them to 0.
+    # Returns the modified mask with only specified regions kept.
+    modified_mask = mask.copy()
+    included_ids = set()
+
+    for region_name in included_region_acronyms:
+        region_id = atlas.structures[region_name]["id"]
+        included_ids.add(region_id)
+        descendants = atlas.get_structure_descendants(region_name)
+        for desc in descendants:
+            desc_id = atlas.structures[desc]["id"]
+            included_ids.add(desc_id)
+
+    all_ids = np.unique(mask)
+    for region_id in all_ids:
+        if region_id != 0 and region_id not in included_ids:
+            modified_mask[modified_mask == region_id] = 0
+
+    return modified_mask
+
+
 def remove_small_fragments(mask, min_size, structure, atlas):
     # Remove small disconnected regions with size less than min_size from the mask - replace them with 0.
     # Returns the cleaned mask and a list of fragment information to be saved in a CSV.
